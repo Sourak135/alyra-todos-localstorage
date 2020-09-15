@@ -1,4 +1,4 @@
-import React, { useState } from "react"
+import React, { useState, useEffect } from "react"
 import TodosList from "./TodosList"
 import SelectTodos from "./SelectTodos"
 import AddTodoForm from "./AddTodoForm"
@@ -23,7 +23,8 @@ const initialTodos = [
 ]
 
 const Todos = () => {
-  const [todos, setTodos] = useState(initialTodos)
+  const [todos, setTodos] = useState(
+    () => JSON.parse(localStorage.getItem("myTodoList")) || initialTodos )
   const [filter, setFilter] = useState("all")
 
   const addTodo = (text) => {
@@ -60,7 +61,19 @@ const Todos = () => {
     return true
   })
 
-  const completedCount = todos.filter((el) => el.isCompleted).length
+  const completedCount = todos.filter((el) => !el.isCompleted).length
+
+  
+  useEffect(()=> {    
+    document.title = completedCount ? `vous avez ${completedCount} taches à accomplir` : "Que devez vous faire aujourd'hui ? "
+  }, [completedCount])
+
+  useEffect(()=> { 
+    // enregistre dans localstorage quand shopping change
+    localStorage.setItem("myTodoList", JSON.stringify(todos))
+  }, [todos])
+
+
   return (
     <main>
       <h2 className="text-center">
